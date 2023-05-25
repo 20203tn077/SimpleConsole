@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
-using SimpleConsole.Validation.Exceptions;
+using SimpleConsole.Exceptions;
 
-namespace SimpleConsole.Validation.Validators;
+namespace SimpleConsole.Validators;
 
 public static class StringValidators
 {
@@ -10,19 +10,19 @@ public static class StringValidators
         if (string.IsNullOrWhiteSpace(value)) throw new InvalidValueException("Debes ingresar un texto con contenido");
     }
 
-    public static Validation<string> MinLength(int minLength) => value =>
+    public static Validator<string> MinLength(int minLength) => value =>
     {
         if (value.Length < minLength)
             throw new InvalidValueException($"Debes ingresar un texto mayor a {minLength} caracteres");
     };
     
-    public static Validation<string> MaxLength(int maxLength) => value =>
+    public static Validator<string> MaxLength(int maxLength) => value =>
     {
         if (value.Length < maxLength)
             throw new InvalidValueException($"Debes ingresar un texto menor a {maxLength} caracteres");
     };
     
-    public static Validation<string> Pattern(Regex pattern) => value =>
+    public static Validator<string> Pattern(Regex pattern) => value =>
     {
         if (!pattern.IsMatch(value))
             throw new InvalidValueException("El texto no cumple con el formato requerido");

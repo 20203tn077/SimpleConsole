@@ -1,4 +1,4 @@
-namespace SimpleConsole.Validation.Exceptions;
+namespace SimpleConsole.Exceptions;
 
 public class InvalidValueException : Exception
 {

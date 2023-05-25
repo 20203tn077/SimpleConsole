@@ -1,4 +1,7 @@
-﻿using SimpleConsole.Validation.Exceptions;
+﻿using System.ComponentModel.DataAnnotations;
+using SimpleConsole.Exceptions;
+using SimpleConsole.Validators;
+
 namespace SimpleConsole;
 
 public class InvalidArrayLengthException : Exception
@@ -63,14 +66,14 @@ public class Console
         Thread.Sleep(_sleepDelay);
     }
 
-    public string ReadString(string message, params Action<string>[] validations) =>
-        GetValueOrRepeat(() => InnerReadString(message), validations);
+    public string ReadString(string message, params Validator<string>[] validators) =>
+        GetValueOrRepeat(() => InnerReadString(message), validators);
 
-    public int ReadInt(string message, params Action<int>[] validations) =>
-        GetValueOrRepeat(() => InnerReadInt(message), validations);
+    public int ReadInt(string message, params Validator<int>[] validators) =>
+        GetValueOrRepeat(() => InnerReadInt(message), validators);
 
-    public double ReadDouble(string message, params Action<double>[] validations) =>
-        GetValueOrRepeat(() => InnerReadDouble(message), validations);
+    public double ReadDouble(string message, params Validator<double>[] validators) =>
+        GetValueOrRepeat(() => InnerReadDouble(message), validators);
     
     public bool Confirm(string message)
     {
@@ -120,24 +123,24 @@ public class Console
         return true;
     }
 
-    private T GetValueOrRepeat<T>(Func<T> providerFunction, params Action<T>[] validations)
+    private T GetValueOrRepeat<T>(Func<T> providerFunction, params Validator<T>[] validators)
     {
         for (;;)
         {
-            try
-            {
+            // try
+            // {
                 var value = providerFunction();
-                foreach (var validation in validations)
+                foreach (var validator in validators)
                 {
-                    validation(value);
+                    validator(value);
                 }
 
                 return value;
-            }
-            catch (Exception e)
-            {
-                Warning(e.Message);
-            }
+            // }
+            // catch (Exception e)
+            // {
+            //     Warning(e.Message);
+            // }
         }
     }
 
