@@ -2,9 +2,7 @@ namespace SimpleConsole.Exceptions;
 
 public class InvalidOptionException : Exception
 {
-    public override string Message { get; } = "Opción inválida";
-
-    public InvalidOptionException()
+    public InvalidOptionException() : base("Opción inválida")
     {
     }
 

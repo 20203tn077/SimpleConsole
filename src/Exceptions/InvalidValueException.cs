@@ -2,13 +2,11 @@ namespace SimpleConsole.Exceptions;
 
 public class InvalidValueException : Exception
 {
-    public InvalidValueException()
+    public InvalidValueException() : base("Valor inválido")
     {
     }
 
     public InvalidValueException(string? message) : base(message)
     {
     }
-
-    public override string Message { get; } = "Valor inválido";
 }

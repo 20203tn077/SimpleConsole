@@ -13,13 +13,13 @@ public static class StringValidators
     public static Validator<string> MinLength(int minLength) => value =>
     {
         if (value.Length < minLength)
-            throw new InvalidValueException($"Debes ingresar un texto mayor a {minLength} caracteres");
+            throw new InvalidValueException($"Debes ingresar un texto de mínimo {minLength} caracteres");
     };
     
     public static Validator<string> MaxLength(int maxLength) => value =>
     {
         if (value.Length < maxLength)
-            throw new InvalidValueException($"Debes ingresar un texto menor a {maxLength} caracteres");
+            throw new InvalidValueException($"Debes ingresar un texto de máximo {maxLength} caracteres");
     };
     
     public static Validator<string> Pattern(Regex pattern) => value =>

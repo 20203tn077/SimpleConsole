@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Globalization;
 using SimpleConsole.Exceptions;
 using SimpleConsole.Validators;
 
@@ -23,6 +23,7 @@ public class Console
 
     public Console(
         int consoleWidth = 119,
+        string decimalSeparator = ".",
         char padChar = '-',
         string warningSymbol = "[!]",
         int sleepDelay = 1500,
@@ -38,6 +39,10 @@ public class Console
         _defaultClear = defaultClear;
         _confirmationKey = confirmationKey;
         _rejectionKey = rejectionKey;
+
+        var cultureInfo = (CultureInfo)Thread.CurrentThread.CurrentCulture.Clone();
+        cultureInfo.NumberFormat.NumberDecimalSeparator = decimalSeparator;
+        Thread.CurrentThread.CurrentCulture = cultureInfo;
     }
     
     public void Greeting(string title, string summary)
@@ -55,7 +60,7 @@ public class Console
             Presiona una tecla para continuar...
             """
         );
-        System.Console.ReadKey(true);
+        ReadKey();
         if (_defaultClear) ClearIfDefault();
     }
 
@@ -80,7 +85,7 @@ public class Console
         return GetValueOrRepeat(() =>
         {
             System.Console.WriteLine($"{message} [{_confirmationKey}/{_rejectionKey}]");
-            var input = System.Console.ReadKey().Key;
+            var input = ReadKey().Key;
             if (input != _confirmationKey && input != _rejectionKey) throw new InvalidOptionException();
             return input;
         }) == _confirmationKey;
@@ -95,11 +100,13 @@ public class Console
     public bool SelectOption<T>(string message, out T selectedOption, IList<T> options, IList<string>? names = null,
         string? noOption = null)
     {
+        if (options.Count == 0) throw new InvalidArrayLengthException("La cantidad de opciones no puede ser cero");
         selectedOption = default(T)!;
         if (names != null)
         {
+            names = new List<string>(names);
             if (names.Count != options.Count)
-                throw new InvalidArrayLengthException("El número de nombres debe ser igual al número de opciones");
+                throw new InvalidArrayLengthException("La cantidad de nombres debe coincidir con la cantidad de opciones");
         }
         else
         {
@@ -109,13 +116,13 @@ public class Console
 
         if (noOption != null) names.Add(noOption);
         var menu = "";
-        for (var i = 1; i <= names.Count; i++) menu += $"{i}.- {names[i]}";
+        for (var i = 0; i < names.Count; i++) menu += $"{i + 1}.- {names[i]}\n";
         menu += message;
         var opIndex = GetValueOrRepeat(() =>
         {
             var opIndex = InnerReadOption(menu) - 1;
             if (opIndex < 0 || opIndex >= names.Count)
-                throw new InvalidValueException($"Debes seleccionar una opción entre 1 y {names.Count}");
+                throw new InvalidOptionException($"Debes seleccionar una opción entre 1 y {names.Count}");
             return opIndex;
         });
         if (opIndex >= options.Count) return false;
@@ -127,8 +134,8 @@ public class Console
     {
         for (;;)
         {
-            // try
-            // {
+            try
+            {
                 var value = providerFunction();
                 foreach (var validator in validators)
                 {
@@ -136,11 +143,11 @@ public class Console
                 }
 
                 return value;
-            // }
-            // catch (Exception e)
-            // {
-            //     Warning(e.Message);
-            // }
+            }
+            catch (Exception e)
+            {
+                Warning(e.Message);
+            }
         }
     }
 
@@ -178,6 +185,13 @@ public class Console
     private static string? ReadLine()
     {
         var input = System.Console.ReadLine();
+        System.Console.WriteLine();
+        return input;
+    }
+    
+    private static ConsoleKeyInfo ReadKey()
+    {
+        var input = System.Console.ReadKey(true);
         System.Console.WriteLine();
         return input;
     }
